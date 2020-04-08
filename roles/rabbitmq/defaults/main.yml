@@ -1,0 +1,5 @@
+---
+rabbitmq_amqp_port: 5672
+rabbitmq_epmd_port: 4369
+rabbitmq_node_port: 25672
+rabbitmq_ulimit_open_files: 1024

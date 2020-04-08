@@ -1,0 +1,5 @@
+[rabbitmq]
+node-master ansible_ssh_host=10.211.55.32
+node-1 ansible_ssh_host=10.211.55.33
+node-2 ansible_ssh_host=10.211.55.34
+node-3 ansible_ssh_host=10.211.55.35

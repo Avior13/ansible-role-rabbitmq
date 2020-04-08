@@ -1,0 +1,56 @@
+---
+- name: restart master
+  systemd:
+    name: rabbitmq-server
+    state: restarted
+    daemon_reload: yes
+  when: inventory_hostname == "node-master"
+
+- name: cat erlang cookie on master
+  command: "cat /var/lib/rabbitmq/.erlang.cookie"
+  register: "rabbitmq_erlang_cookie"
+  when: inventory_hostname == "node-master"
+
+- name: set erlang cookie on master on non-master
+  set_fact:
+    rabbitmq_erlang_cookie: "{{ hostvars['node-master']['rabbitmq_erlang_cookie']['stdout'] }}"
+  when: inventory_hostname != "node-master"
+
+- name: copy erlang cookie
+  template:
+    src: erlang.cookie.j2
+    dest: /var/lib/rabbitmq/.erlang.cookie
+    owner: rabbitmq
+    group: rabbitmq
+    mode: 0400
+    backup: yes
+  when: inventory_hostname != "node-master"
+
+- name: restart all rabbitmq nodes
+  systemd:
+    name: rabbitmq-server
+    state: restarted
+    daemon_reload: yes
+
+- name: stopping rabbitmq app
+  command: rabbitmqctl stop_app
+  when: inventory_hostname != "node-master"
+
+- name: resetting rabbitmq
+  command: rabbitmqctl reset
+  when: inventory_hostname != "node-master"
+
+- name: joining rabbitmq node to cluster
+  command: rabbitmqctl join_cluster rabbit@node-master
+  when: inventory_hostname != "node-master"
+
+- name: starting rabbitmq app
+  command: rabbitmqctl start_app
+  when: inventory_hostname != "node-master"
+
+- name: getting cluster_status
+  command: rabbitmqctl cluster_status
+  register: cluster_status
+  when: inventory_hostname != "node-master"
+
+- debug: var=cluster_status.stdout_lines

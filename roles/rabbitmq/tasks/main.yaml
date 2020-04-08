@@ -1,0 +1,15 @@
+---
+- name: "Install RabbitMQ"
+  include: "debian.yaml"
+  tags:
+    - install
+
+- name: "Create cluster"
+  include: "cluster.yaml"
+  tags:
+    - cluster
+    
+- name: "Add users \ plugins \ queue"
+  include: "config.yaml"
+  tags:
+    - config

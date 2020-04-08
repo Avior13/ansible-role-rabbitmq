@@ -1,0 +1,8 @@
+---
+  - name: rabbitmq cluster
+    hosts: rabbitmq
+    become: yes
+    become_method: su
+    gather_facts: yes
+    roles:
+      - rabbitmq

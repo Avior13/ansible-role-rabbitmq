@@ -1,0 +1,43 @@
+---
+- name: enable rabbitmq plugins
+  rabbitmq_plugin:
+    names: rabbitmq_management
+    state: enabled
+  notify:
+    - restart rabbitmq-server
+
+- name: add vhost
+  rabbitmq_vhost:
+    name: "{{ item.vhost }}"
+    state: present
+  with_items:
+       - "{{ rabbitmq_vhost }}"
+  when: inventory_hostname == "node-master"
+
+- name: add users
+  rabbitmq_user:
+    user: "{{ item.user }}"
+    password: "{{ item.pass }}"
+    vhost: "{{ item.vhost }}"
+    configure_priv: .*
+    read_priv: .*
+    write_priv: .*
+    state: present
+    tags: "{{ item.tags }}"
+  with_items:
+       - "{{ rabbitmq_vhost }}"
+  when: inventory_hostname == "node-master"
+  
+- name: Manage queues
+  rabbitmq_queue:
+    name: "{{ item.1.queue_name }}"
+    vhost: "{{ item.0.vhost }}"
+    login_user: "{{ item.0.user }}"
+    login_password: "{{ item.0.pass }}"
+  with_subelements:
+       - "{{ rabbitmq_vhost }}"
+       - queues
+  when: inventory_hostname == "node-master"
+
+- name: setting policy that allows for queues mirroring to all nodes in the cluster
+  command: rabbitmqctl set_policy ha-all "." '{"ha-mode":"all"}'

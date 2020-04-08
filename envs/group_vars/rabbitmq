@@ -1,0 +1,30 @@
+rabbitmq_amqp_port: 5672
+rabbitmq_epmd_port: 4369
+rabbitmq_node_port: 25672
+rabbitmq_ulimit_open_files: 1024
+
+rabbitmq_vhost:
+ - vhost: /
+   queues:
+      - queue_name: Main
+   user: admin
+   pass: admin
+   tags: administrator
+
+ - vhost: test1
+   queues:
+      - queue_name: test1
+      - queue_name: test1
+   user: test1
+   pass: test1
+   tags: administrator
+
+ - vhost: test2
+   queues:
+      - queue_name: test2
+        state:
+      - queue_name: test2
+        state:
+   user: test2
+   pass: test2
+   tags: administrator
